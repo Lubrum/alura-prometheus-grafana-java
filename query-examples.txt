@@ -1,0 +1,14 @@
+http_server_requests_seconds_count{application="app-forum-api", method="GET", status="200"}
+http_server_requests_seconds_count{application="app-forum-api", method="GET", status=~"2.."}
+http_server_requests_seconds_count{application="app-forum-api", method="GET", status=~"2..|3.."}
+http_server_requests_seconds_count{application="app-forum-api", method="GET", status=~"2..|3..", uri!="/actuator/prometheus"}
+http_server_requests_seconds_count{application="app-forum-api", method=~"GET|POST", status!~"2..|3..", uri!="/actuator/prometheus"}
+http_server_requests_seconds_count{application="app-forum-api", method=~"GET|POST", status!~"2..|3..", uri!="/actuator/prometheus"} offset 1m
+
+http_server_requests_seconds_count{application="app-forum-api", uri!="/actuator/prometheus"}[1m]
+increase(http_server_requests_seconds_count{application="app-forum-api", uri!="/actuator/prometheus"}[1m])
+irate(http_server_requests_seconds_count{application="app-forum-api"}[1m])
+sum(irate(http_server_requests_seconds_count{application="app-forum-api"}[1m]))
+
+
+
