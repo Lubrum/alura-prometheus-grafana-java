@@ -1,3 +1,4 @@
+# prometheus
 http_server_requests_seconds_count{application="app-forum-api", method="GET", status="200"}
 http_server_requests_seconds_count{application="app-forum-api", method="GET", status=~"2.."}
 http_server_requests_seconds_count{application="app-forum-api", method="GET", status=~"2..|3.."}
@@ -9,6 +10,64 @@ http_server_requests_seconds_count{application="app-forum-api", uri!="/actuator/
 increase(http_server_requests_seconds_count{application="app-forum-api", uri!="/actuator/prometheus"}[1m])
 irate(http_server_requests_seconds_count{application="app-forum-api"}[1m])
 sum(irate(http_server_requests_seconds_count{application="app-forum-api"}[1m]))
+
+# grafana queries
+label_values(application)
+label_values(jvm_classes_loaded_classes{application="$application"}, instance)
+label_values(hikaricp_connections{instance="$instance", application="$application"}, pool)
+
+#dashboard grafana
+
+process_uptime_seconds{application="$application", instance="$instance", job="app-forum-api"}
+process_start_time_seconds{application="$application", instance="$instance", job="app-forum-api"}
+increase(logback_events_total{application="$application", instance="$instance", job="app-forum-api", level="warn"}[5m])
+increase(logback_events_total{application="$application", instance="$instance", job="app-forum-api", level="error"}[5m])
+sum(increase(logback_events_total{application="$application", instance="$instance", job="app-forum-api", level="warn"}[5m]))
+hikaricp_connections{application="$application", instance="$instance", job="app-forum-api", pool="$pool"}
+increase(hikaricp_connections_timeout_total{application="$application", instance="$instance", job="app-forum-api", pool="$pool"}[20m])
+
+increase(auth_user_errors_total[1m])
+increase(auth_user_success_total[1m])
+
+#increase é taxa de crescimento
+# total requests last minute
+sum(increase(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m]))
+
+# response time last minute
+rate(http_server_requests_seconds_sum{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m]) / rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m])
+
+sum(increase(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m], status="500")))
+
+# percentual erros 500
+sum(rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus", status="500"}[5m])) / sum(rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[5m]))
+sum(rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus", status="404"}[5m])) / sum(rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[5m]))
+sum(rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus", status="400"}[5m])) / sum(rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[5m]))
+
+histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m])) by (le))
+histogram_quantile(0.90, sum(rate(http_server_requests_seconds_bucket{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m])) by (le))
+histogram_quantile(0.75, sum(rate(http_server_requests_seconds_bucket{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m])) by (le))
+histogram_quantile(0.50, sum(rate(http_server_requests_seconds_bucket{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m])) by (le))
+histogram_quantile(0.25, sum(rate(http_server_requests_seconds_bucket{application="$application", instance="$instance", job="app-forum-api", uri!="/actuator/prometheus"}[1m])) by (le))
+
+sum(increase(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", uri!="/topicos"}[1m]))
+
+rate(http_server_requests_seconds_sum{application="$application", instance="$instance", job="app-forum-api", status="200", uri="/topicos"}[1m]) / rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", status="200", uri="/topicos"}[1m])
+rate(http_server_requests_seconds_sum{application="$application", instance="$instance", job="app-forum-api", status="200", uri="/topicos/{id}"}[1m]) / rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", status="200", uri="/topicos/{id}"}[1m])
+rate(http_server_requests_seconds_sum{application="$application", instance="$instance", job="app-forum-api", status="200", uri="/auth"}[1m]) / rate(http_server_requests_seconds_count{application="$application", instance="$instance", job="app-forum-api", status="200", uri="/auth"}[1m])
+
+http_server_requests_seconds_max{application="$application", instance="$instance", job="app-forum-api", status="200"}
+
+sum(jvm_memory_used_bytes{application="$application", instance="$instance", job="app-forum-api", area="heap"})*100 / sum(jvm_memory_max_bytes{application="$application", instance="$instance", job="app-forum-api", area="heap"})
+
+sum(jvm_memory_used_bytes{application="$application", instance="$instance", job="app-forum-api", area="nonheap"})*100 / sum(jvm_memory_max_bytes{application="$application", instance="$instance", job="app-forum-api", area="nonheap"})
+
+system_cpu_usage{application="$application", instance="$instance", job="app-forum-api"}
+process_cpu_usage{application="$application", instance="$instance", job="app-forum-api"}
+
+system_load_average_1m{application="$application", instance="$instance", job="app-forum-api"}
+system_cpu_count{application="$application", instance="$instance", job="app-forum-api"}
+
+# criar conta no slack e workspace #alura por exemplo... para ativar a parte de webhook e notificações
 
 
 

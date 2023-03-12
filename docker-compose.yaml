@@ -16,7 +16,7 @@ services:
     container_name: redis-forum-api
     restart: unless-stopped
     expose:
-      - 6379
+      - ${REDIS_PORT}
     networks:
       - cache
 
@@ -25,21 +25,29 @@ services:
     container_name: mysql-forum-api
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: 'forum'
-      MYSQL_USER: 'forum'
-      MYSQL_PASSWORD: 'Bk55yc1u0eiqga6e'
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
     volumes:
       - ./mysql:/docker-entrypoint-initdb.d
     expose:
-      - 3306
+      - ${MYSQL_PORT}
     networks:
       - database
     depends_on:
       - redis-forum-api
 
   app-forum-api:
+    environment:
+      - APP_PORT=${APP_PORT}
+      - REDIS_PORT=${REDIS_PORT}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
     build:
       context: ./app/
       dockerfile: Dockerfile
@@ -53,20 +61,23 @@ services:
     depends_on:
       - mysql-forum-api
     healthcheck:
-      test: "curl -sS http://app-forum-api:8080/actuator/health"
+      test: "curl -sS http://app-forum-api:${APP_PORT}/actuator/health"
       interval: 1s
       timeout: 30s
       retries: 60
   
   proxy-forum-api:
+    environment:
+      APP_PORT: ${APP_PORT}
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
     image: nginx
     container_name: proxy-forum-api
     restart: unless-stopped
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/templates/nginx.conf.template
       - ./nginx/proxy.conf:/etc/nginx/conf.d/proxy.conf
     ports:
-      - "80:80"
+      - ${NGINX_PORT}:${NGINX_PORT}
     networks:
       - proxy
       - api
@@ -74,26 +85,56 @@ services:
       - app-forum-api
 
   prometheus-forum-api:
-    image: prom/prometheus:latest
+    build:
+      context: prometheus/.
+      args:
+        PROMETHEUS_USER: ${PROMETHEUS_USER}
+    environment:
+      - APP_PORT=${APP_PORT}
+      - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+      - ALERT_MANAGER_PORT=${ALERT_MANAGER_PORT}
+      - PROMETHEUS_USER=${PROMETHEUS_USER}
+    image: prometheus-env:0.1
     container_name: prometheus-forum-api
     restart: unless-stopped
-    user: "1000:1000"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alert.rules:/etc/prometheus/alert.rules
       - ./prometheus/prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--web.enable-lifecycle'
     ports:
-      - "9090:9090"
+      - ${PROMETHEUS_PORT}:${PROMETHEUS_PORT}
     networks:
       - monit
       - api
     depends_on:
       - proxy-forum-api
+    user: ${PROMETHEUS_USER}:${PROMETHEUS_USER} # need this to prometheus because of problem with permission denied with logs
+  
+  alertmanager-forum-api:
+    image: alertmanager-env:0.1
+    build:
+      context: alertmanager/.
+    environment:
+      - SLACK_HOOK_URL=${SLACK_HOOK_URL}
+    container_name: alertmanager-forum-api
+    ports: 
+      - ${ALERT_MANAGER_PORT}:${ALERT_MANAGER_PORT}
+    networks:
+      - monit
+    depends_on:
+      - prometheus-forum-api
+
+  grafana-forum-api:
+    image: grafana/grafana
+    container_name: grafana-forum-api
+    volumes:
+      - ./grafana:/var/lib/grafana
+    restart: unless-stopped
+    ports:
+      - ${GRAFANA_PORT}:${GRAFANA_PORT}
+    networks:
+      - monit
+    depends_on:
+      - alertmanager-forum-api
 
   client-forum-api:
     build:
@@ -105,4 +146,4 @@ services:
     networks:
       - proxy
     depends_on:
-      - proxy-forum-api
+      - grafana-forum-api

@@ -1,32 +1,50 @@
-CREATE TABLE `forum`.`usuario`(`id` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `forum`.`usuario`(
+    `id` int(11) NOT NULL AUTO_INCREMENT,
 	`nome` TEXT NOT NULL,
 	`email` VARCHAR(255) NOT NULL,
 	`senha` VARCHAR(255) NOT NULL,
-	PRIMARY KEY (`id`));
-CREATE TABLE `forum`.`perfil`(`id` int(11) NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `forum`.`perfil`(
+    `id` int(11) NOT NULL AUTO_INCREMENT,
 	`nome` TEXT NOT NULL,
-	PRIMARY KEY (`id`));
-CREATE TABLE `forum`.`usuario_perfis`(`usuario_id` int(11) NOT NULL,
-	`perfis_id` int(11) NOT NULL);
-CREATE TABLE `forum`.`curso`(`id` int(11) NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `forum`.`usuario_perfis`(
+    `usuario_id` int(11) NOT NULL,
+	`perfis_id` int(11) NOT NULL
+);
+
+CREATE TABLE `forum`.`curso`(
+    `id` int(11) NOT NULL AUTO_INCREMENT,
 	`nome` text NOT NULL,
-        `categoria` text NOT NULL,
-	PRIMARY KEY (`id`));
-CREATE TABLE `forum`.`resposta`(`id` int(11) NOT NULL AUTO_INCREMENT,
-        `autor_id` int(11) NOT NULL,
+    `categoria` text NOT NULL,
+	PRIMARY KEY (`id`)
+	);
+
+CREATE TABLE `forum`.`resposta`(
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `autor_id` int(11) NOT NULL,
 	`topico_id` int(11) NOT NULL,
-        `mensagem` text NOT NULL,
-        `solucao`text NOT NULL,
-        `data_criacao` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (`id`));
-CREATE TABLE `forum`.`topico`(`id` int(11) NOT NULL AUTO_INCREMENT,
+    `mensagem` text NOT NULL,
+    `solucao`text NOT NULL,
+    `data_criacao` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `forum`.`topico`(
+    `id` int(11) NOT NULL AUTO_INCREMENT,
 	`titulo` text NOT NULL,
 	`mensagem` text NOT NULL,
 	`data_criacao` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`status` text NOT NULL,
 	`autor_id` int(11) NOT NULL,
 	`curso_id` int(11) NOT NULL,
-        PRIMARY KEY (`id`));
+    PRIMARY KEY (`id`)
+);
+
 INSERT INTO usuario(nome, email, senha)VALUES('Aluno', 'aluno@email.com', '$2a$10$sFKmbxbG4ryhwPNx/l3pgOJSt.fW1z6YcUnuE2X8APA/Z3NI/oSpq');
 INSERT INTO usuario(nome, email, senha)VALUES('Moderador', 'moderador@email.com', '$2a$10$sFKmbxbG4ryhwPNx/l3pgOJSt.fW1z6YcUnuE2X8APA/Z3NI/oSpq');
 INSERT INTO perfil(id, nome)VALUES(1, 'ROLE_ALUNO');

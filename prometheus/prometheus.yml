@@ -1,6 +1,17 @@
 global:
   scrape_interval: 5s
+
+rule_files:
+  - alert.rules
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - alertmanager-forum-api:${ALERT_MANAGER_PORT}
+
 scrape_configs:
+
 - job_name: prometheus-forum-api
   scrape_interval: 15s
   scrape_timeout: 10s
@@ -8,9 +19,10 @@ scrape_configs:
   scheme: http
   static_configs:
   - targets:
-    - prometheus-forum-api:9090
+    - prometheus-forum-api:${PROMETHEUS_PORT}
+
 - job_name: app-forum-api
   metrics_path: /actuator/prometheus
   static_configs:
   - targets:
-    - app-forum-api:8080
+    - app-forum-api:${APP_PORT}
