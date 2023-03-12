@@ -28,7 +28,11 @@ public class AutenticacaoController {
 	Counter authUserSuccess;
 	Counter authUserErrors;
 
-	public AutenticacaoController(MeterRegistry registry) {
+	private final AuthenticationManager authManager;
+
+	private final TokenService tokenService;
+
+	public AutenticacaoController(MeterRegistry registry, AuthenticationManager authManager, TokenService tokenService) {
 		authUserSuccess = Counter.builder("auth_user_success")
 				.description("usuarios autenticados")
 				.register(registry);
@@ -36,14 +40,10 @@ public class AutenticacaoController {
 		authUserErrors = Counter.builder("auth_user_errors")
 				.description("erros de login")
 				.register(registry);
+		this.authManager = authManager;
+		this.tokenService = tokenService;
 	}
 
-	@Autowired
-	private AuthenticationManager authManager;
-	
-	@Autowired
-	private TokenService tokenService;
-	
 	@PostMapping
 	public ResponseEntity<TokenDto> autenticar(@RequestBody @Valid LoginForm form) {
 		UsernamePasswordAuthenticationToken dadosLogin = form.converter();

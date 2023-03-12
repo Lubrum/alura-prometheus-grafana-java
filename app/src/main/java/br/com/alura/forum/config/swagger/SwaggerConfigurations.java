@@ -1,6 +1,7 @@
 package br.com.alura.forum.config.swagger;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,14 +25,14 @@ public class SwaggerConfigurations {
 				.paths(PathSelectors.ant("/**"))
 				.build()
 				.ignoredParameterTypes(Usuario.class)
-				.globalOperationParameters(Arrays.asList(
+				.globalOperationParameters(Collections.singletonList(
 						new ParameterBuilder()
-						.name("Authorization")
-						.description("Header para token JWT")
-						.modelRef(new ModelRef("String"))
-						.parameterType("Header")
-						.required(false)
-						.build()));
+								.name("Authorization")
+								.description("Header para token JWT")
+								.modelRef(new ModelRef("String"))
+								.parameterType("Header")
+								.required(false)
+								.build()));
 	}
 
 }

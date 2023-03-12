@@ -13,12 +13,18 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 public class TokenService {
-	
-	@Value("${forum.jwt.expiration}")
-	private String expiration;
-	
-	@Value("${forum.jwt.secret}")
-	private String secret;
+
+	private final String expiration;
+
+	private final String secret;
+
+	public TokenService(
+			@Value("${forum.jwt.expiration}") String expiration,
+			@Value("${forum.jwt.secret}") String secret
+	) {
+		this.expiration = expiration;
+		this.secret = secret;
+	}
 
 	public String gerarToken(Authentication authentication) {	
 		Usuario logado = (Usuario) authentication.getPrincipal();

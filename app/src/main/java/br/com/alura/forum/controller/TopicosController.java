@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -36,25 +35,28 @@ import br.com.alura.forum.repository.TopicoRepository;
 @RestController
 @RequestMapping("/topicos")
 public class TopicosController {
-	
-	@Autowired
-	private TopicoRepository topicoRepository;
-	
-	@Autowired
-	private CursoRepository cursoRepository;
+
+	private final TopicoRepository topicoRepository;
+
+	private final CursoRepository cursoRepository;
+
+	public TopicosController(TopicoRepository topicoRepository, CursoRepository cursoRepository) {
+		this.topicoRepository = topicoRepository;
+		this.cursoRepository = cursoRepository;
+	}
 	
 	@GetMapping
 	@Cacheable(value = "listaDeTopicos")
 	public Page<TopicoDto> lista(@RequestParam(required = false) String nomeCurso, 
 			@PageableDefault(sort = "dataCriacao", direction = Direction.DESC, page = 0, size = 10) Pageable paginacao) {
-		
+
+		Page<Topico> topicos;
 		if (nomeCurso == null) {
-			Page<Topico> topicos = topicoRepository.findAll(paginacao);
-			return TopicoDto.converter(topicos);
+			topicos = topicoRepository.findAll(paginacao);
 		} else {
-			Page<Topico> topicos = topicoRepository.findByCursoNome(nomeCurso, paginacao);
-			return TopicoDto.converter(topicos);
+			topicos = topicoRepository.findByCursoNome(nomeCurso, paginacao);
 		}
+		return TopicoDto.converter(topicos);
 	}
 	
 	@PostMapping
@@ -69,13 +71,13 @@ public class TopicosController {
 	}
 	
 	@GetMapping("/{id}")
+	@Transactional
 	public ResponseEntity<DetalhesDoTopicoDto> detalhar(@PathVariable Long id) {
 		Optional<Topico> topico = topicoRepository.findById(id);
-		if (topico.isPresent()) {
-			return ResponseEntity.ok(new DetalhesDoTopicoDto(topico.get()));
-		}
-		
-		return ResponseEntity.notFound().build();
+		return topico.map(value -> ResponseEntity.ok(
+				new DetalhesDoTopicoDto(value)
+		)).orElseGet(() -> ResponseEntity.notFound().build());
+
 	}
 	
 	@PutMapping("/{id}")
