@@ -1,10 +1,9 @@
 package br.com.alura.forum.controller;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

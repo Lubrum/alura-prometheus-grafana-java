@@ -1,38 +1,39 @@
 package br.com.alura.forum.config.swagger;
 
-import java.util.Arrays;
-import java.util.Collections;
-
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import br.com.alura.forum.modelo.Usuario;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.schema.ModelRef;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-
 @Configuration
 public class SwaggerConfigurations {
-	
+
 	@Bean
-	public Docket forumApi() {
-		return new Docket(DocumentationType.SWAGGER_2)
-				.select()
-				.apis(RequestHandlerSelectors.basePackage("br.com.alura.forum"))
-				.paths(PathSelectors.ant("/**"))
-				.build()
-				.ignoredParameterTypes(Usuario.class)
-				.globalOperationParameters(Collections.singletonList(
-						new ParameterBuilder()
-								.name("Authorization")
-								.description("Header para token JWT")
-								.modelRef(new ModelRef("String"))
-								.parameterType("Header")
-								.required(false)
-								.build()));
+	public OpenAPI customOpenAPI() {
+		return new OpenAPI().info(apiInfo());
 	}
 
+	private Info apiInfo() {
+		return new Info()
+				.title("Alura forum API")
+				.description("API de criação de tópicos e respostas")
+				.version("1.0")
+				.contact(apiContact())
+				.license(apiLicence());
+	}
+
+	private License apiLicence() {
+		return new License()
+				.name("MIT Licence")
+				.url("https://opensource.org/licenses/mit-license.php");
+	}
+
+	private Contact apiContact() {
+		return new Contact()
+				.name("Luciano Moraes da Luz Brum")
+				.email("teste@gmail.com")
+				.url("https://github.com/Lubrum");
+	}
 }

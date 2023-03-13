@@ -3,8 +3,8 @@ package br.com.alura.forum.controller;
 import java.net.URI;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-import javax.validation.Valid;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

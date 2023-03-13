@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 networks:
   database:
@@ -12,7 +12,7 @@ networks:
 
 services:
   redis-forum-api:
-    image: redis
+    image: redis:7.0.9@sha256:bef17825e8f1224b2956d84b7110cad7eb23601df441d2912c1b283d821f2045
     container_name: redis-forum-api
     restart: unless-stopped
     expose:
@@ -21,7 +21,7 @@ services:
       - cache
 
   mysql-forum-api:
-    image: mysql:5.7
+    image: mysql:8.0.32@sha256:79866c649987750de41276796f7b29a54be80834dd2bc20e435dc9554a33945f
     container_name: mysql-forum-api
     restart: unless-stopped
     environment:
@@ -70,7 +70,7 @@ services:
     environment:
       APP_PORT: ${APP_PORT}
       NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx
-    image: nginx
+    image: nginx:1.23.3@sha256:942ae2dfd73088b54d7151a3c3fd5af038a51c50029bfcfd21f1e650d9579967
     container_name: proxy-forum-api
     restart: unless-stopped
     volumes:
@@ -124,7 +124,7 @@ services:
       - prometheus-forum-api
 
   grafana-forum-api:
-    image: grafana/grafana
+    image: grafana/grafana:9.4.3@sha256:19f61fb673fe3e8de42e0a1b8ffe84cb78d39385b9a8480e8288f304a783c813
     container_name: grafana-forum-api
     volumes:
       - ./grafana:/var/lib/grafana
