@@ -1,4 +1,4 @@
-# Alura - Formação DevOps
+# Alura - Formação/escola DevOps - Trilha DevOps
 
 # 4.1 Observabilidade: coletando métricas de uma aplicação com Prometheus
 
