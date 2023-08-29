@@ -2,3 +2,4 @@
 prometheus/prometheus_data/*
 grafana/grafana.db
 .env
+grafana/*.json

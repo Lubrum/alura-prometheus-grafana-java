@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.6_10-jdk-alpine@sha256:ed5b03e6bac93bfc3c2e23c592f2d8f6556f5f6120f439f62aec3134f9a7f917 AS builder
+FROM eclipse-temurin:20.0.2_9-jdk-alpine@sha256:27f64fb39e4e052bba5fdd4659875b8ab421eb3c5d85ab9d4a8025808fc39cfa AS builder
 
 WORKDIR /build
 
@@ -12,7 +12,7 @@ RUN ./mvnw clean install -DskipTests
 RUN cp /build/target/*.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
-FROM eclipse-temurin:17.0.6_10-jre-alpine@sha256:2b33ef284e6dc43a61903cef6d36dbce13414a9e5444e2c96cdd5e35123f9903
+FROM eclipse-temurin:20.0.2_9-jre-alpine@sha256:987af6a7e762cf950598c8f5ebaad9fff9dcf220fc8a3bddb9fd55b49b48a3e4
 
 WORKDIR /app
 

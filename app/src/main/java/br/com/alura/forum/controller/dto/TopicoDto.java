@@ -1,5 +1,6 @@
 package br.com.alura.forum.controller.dto;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -9,12 +10,13 @@ import br.com.alura.forum.modelo.Topico;
 
 public class TopicoDto implements Serializable {
 	
+	@Serial
 	private static final long serialVersionUID = 1L;
 
-	private Long id;
-	private String titulo;
-	private String mensagem;
-	private LocalDateTime dataCriacao;
+	private final Long id;
+	private final String titulo;
+	private final String mensagem;
+	private final LocalDateTime dataCriacao;
 	
 	public TopicoDto(Topico topico) {
 		this.id = topico.getId();
