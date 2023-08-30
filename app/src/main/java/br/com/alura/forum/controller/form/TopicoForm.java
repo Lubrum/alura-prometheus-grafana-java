@@ -1,5 +1,6 @@
 package br.com.alura.forum.controller.form;
 
+import br.com.alura.forum.modelo.Usuario;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -8,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 import br.com.alura.forum.modelo.Curso;
 import br.com.alura.forum.modelo.Topico;
 import br.com.alura.forum.repository.CursoRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class TopicoForm {
 
@@ -34,7 +36,9 @@ public class TopicoForm {
 
 	public Topico converter(CursoRepository cursoRepository) {
 		Curso curso = cursoRepository.findByNome(nomeCurso);
-		return new Topico(titulo, mensagem, curso);
+		Usuario autor = ((Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+
+		return new Topico(titulo, mensagem, curso, autor);
 	}
 
 }
